@@ -22,10 +22,15 @@ of SetHttpClient and SetToken, or take a look at the fluent-style companion
 methods WithHttpClient and WithToken.
 */
 type ApiClient struct {
-	httpClient http.Client
+	HttpClient HTTPClient
 
 	// Insert an API token here if you have one. It will be sent across with all requests.
 	authToken string
+}
+
+// HTTPClient interface
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
 }
 
 func (c ApiClient) Get(out interface{}, r request.Request) error {
@@ -51,8 +56,8 @@ func (c ApiClient) Get(out interface{}, r request.Request) error {
 //
 // A call to this method is not necessary in order to create a working instance
 // of Client. `new(footballdata.Client)` works just as fine.
-func NewClient(h *http.Client) *ApiClient {
-	return &ApiClient{httpClient: *h}
+func NewClient(h *HTTPClient) *ApiClient {
+	return &ApiClient{HttpClient: *h}
 }
 
 // SetToken sets the authentication token.
@@ -86,7 +91,7 @@ func (c *ApiClient) doJSON(method string, path string, values url.Values) (j *js
 	req.Header.Set("User-Agent", "go-footballdata/0.1")
 
 	// Execute request
-	resp, err := c.httpClient.Do(req)
+	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return
 	}
