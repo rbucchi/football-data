@@ -26,6 +26,25 @@ type Client struct {
 	authToken string
 }
 
+func (c Client) Get(out interface{}, r Request) error {
+	var urlValues = url.Values{}
+	filter, err := r.filter()
+	if err != nil {
+		return err
+	}
+	if filter.Matchday != 0 {
+		urlValues.Set("matchday", fmt.Sprintf("%d", filter.Matchday))
+	}
+	if filter.Plan != "" {
+		urlValues.Set("plan", filter.Plan)
+	}
+	d, _, err := c.doJSON("GET", r.path(), urlValues)
+	if err == nil {
+		err = d.Decode(&out)
+	}
+	return err
+}
+
 // NewClient creates a new Client instance that wraps around the given HTTP client.
 //
 // A call to this method is not necessary in order to create a working instance
@@ -47,10 +66,6 @@ func (c *Client) SetToken(authToken string) {
 func (c Client) WithToken(authToken string) *Client {
 	c.authToken = authToken
 	return &c
-}
-
-func (c *Client) req(path string, pathValues ...interface{}) request {
-	return request{c, fmt.Sprintf(path, pathValues...), url.Values{}}
 }
 
 // Executes an HTTP request with given parameters and on success returns the response wrapped in a JSON decoder.

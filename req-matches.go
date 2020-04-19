@@ -1,18 +1,23 @@
 package main
 
-type MatchesRequest struct{ request }
+import "fmt"
 
-func (c *Client) Matches(competitionId uint32) MatchesRequest {
-	r := MatchesRequest{c.req("competitions/%d/matches", competitionId)}
-	return r
+type MatchesRequest struct {
+	Filter      Filter
+	Competition uint32
 }
 
-// Get retrieve list
-func (r MatchesRequest) Get() (s MatchList, err error) {
-	d, err := r.Do()
+func (mr MatchesRequest) path() string {
+	if mr.Competition != 0 {
+		return fmt.Sprintf("competitions/%d/matches", mr.Competition)
+	}
+	return "matches"
+}
 
-	if err == nil {
-		err = d.Decode(&s)
+func (mr MatchesRequest) filter() (f Filter, err error) {
+	f = mr.Filter
+	if mr.Filter.Plan != "" {
+		err = &FilterError{Msg: "cannot filter matches by plan"}
 	}
 	return
 }
