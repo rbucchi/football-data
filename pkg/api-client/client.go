@@ -21,14 +21,14 @@ token and the HTTP client. For more information, see the respective documentatio
 of SetHttpClient and SetToken, or take a look at the fluent-style companion
 methods WithHttpClient and WithToken.
 */
-type Client struct {
+type ApiClient struct {
 	httpClient http.Client
 
 	// Insert an API token here if you have one. It will be sent across with all requests.
 	authToken string
 }
 
-func (c Client) Get(out interface{}, r request.Request) error {
+func (c ApiClient) Get(out interface{}, r request.Request) error {
 	var urlValues = url.Values{}
 	filter, err := r.GetFilter()
 	if err != nil {
@@ -51,13 +51,13 @@ func (c Client) Get(out interface{}, r request.Request) error {
 //
 // A call to this method is not necessary in order to create a working instance
 // of Client. `new(footballdata.Client)` works just as fine.
-func NewClient(h *http.Client) *Client {
-	return &Client{httpClient: *h}
+func NewClient(h *http.Client) *ApiClient {
+	return &ApiClient{httpClient: *h}
 }
 
 // SetToken sets the authentication token.
 // Calling this method is *optional*.
-func (c *Client) SetToken(authToken string) {
+func (c *ApiClient) SetToken(authToken string) {
 	c.authToken = authToken
 }
 
@@ -65,13 +65,13 @@ func (c *Client) SetToken(authToken string) {
 // instance.
 //
 // This method allows for easy fluent-style usage.
-func (c Client) WithToken(authToken string) *Client {
+func (c ApiClient) WithToken(authToken string) *ApiClient {
 	c.authToken = authToken
 	return &c
 }
 
 // Executes an HTTP request with given parameters and on success returns the response wrapped in a JSON decoder.
-func (c *Client) doJSON(method string, path string, values url.Values) (j *json.Decoder, meta ResponseMeta, err error) {
+func (c *ApiClient) doJSON(method string, path string, values url.Values) (j *json.Decoder, meta ResponseMeta, err error) {
 	// Create request
 	req := &http.Request{
 		Method: method,
