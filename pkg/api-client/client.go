@@ -71,6 +71,7 @@ func (c *ApiClient) SetToken(authToken string) {
 //
 // This method allows for easy fluent-style usage.
 func (c ApiClient) WithToken(authToken string) *ApiClient {
+	c.HttpClient = &http.Client{}
 	c.authToken = authToken
 	return &c
 }
